@@ -1,0 +1,57 @@
+{
+  "appPrivate": "AQIDBAUGBwgJCgsMDQ4PEBESExQVFhcYGRobHB0eHyA",
+  "hostPrivate": "QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVpbXF1eX2A",
+  "appPublic": "B6N8vBQgk8i3VdwbEOhstCY3StFqqFPtC9_AsrhtHHw",
+  "hostPublic": "ZLEBsdC-WocEvQePmJUAH8A-jp-VIvGI3RKNmEbUhGY",
+  "key": "qi7sK9ZbsDB_cHS2DpwLCfpJL5Bgt4OxnVk9L6fHXVw",
+  "nonce": "d3JhbmdsZS1uLTAx",
+  "aad": "host_1|evt_1",
+  "plaintext": "{\"title\":\"api-server needs you\",\"body\":\"Claude wants to run git push\",\"agent\":\"claude\"}",
+  "envelope": {
+    "v": 1,
+    "n": "d3JhbmdsZS1uLTAx",
+    "c": "E8ODMKG6zgtfHipi2YGMemZIqw89JyE6ewk2r7r4KBrxEdMedxeOy4TMZdEO31rfn5j-QT0ZD6KptokGUaRIQR_KYAhLbiXwBIRiOaVvjZlrYt3UUZSegzHZ4L_1Hs8FRJ7WqXJtxg"
+  },
+  "sas": [
+    "apple",
+    "apple",
+    "cactus",
+    "falcon"
+  ],
+  "commit": "W2I20yWHYF_0gt9KwTduDv-4nxOg4l5hyXbSDPq2j30",
+  "decisionEnvelope": {
+    "v": 1,
+    "n": "d3JhbmdsZS1uLTAy",
+    "c": "zNE50ExUEL3j8atDFS0HFUmkF0pD0izp-CV0qW7LBo8DxXy9Ckhj5FLld_nFpiA3Gw"
+  },
+  "qr": {
+    "t": "EBESExQVFhcYGRobHB0eHw",
+    "k": "ICEiIyQlJicoKSorLC0uLw",
+    "offerId": "off_vector",
+    "relay": "https://api.wrangle.stackframes.dev",
+    "name": "Alex's Mac",
+    "url": "wrangle://pair?v=1\u0026r=aHR0cHM6Ly9hcGkud3JhbmdsZS5zdGFja2ZyYW1lcy5kZXY\u0026o=off_vector\u0026t=EBESExQVFhcYGRobHB0eHw\u0026k=ICEiIyQlJicoKSorLC0uLw\u0026h=ZLEBsdC-WocEvQePmJUAH8A-jp-VIvGI3RKNmEbUhGY\u0026n=QWxleCdzIE1hYw",
+    "mac": "Vnz8ebin1_oYC7N0a_KvKEqp7xT0abafu-DgO960HnU",
+    "tokenHash": "_C4scwcr-ivaA_-TB0ct69PMgQUCioqeI141uo0uN_Q",
+    "hostKeyCommit": "d4bLvWG-k-W3b7aqTvGwkDSXw2Gc1WbFqOvTFsrthMU"
+  },
+  "ssh": {
+    "deviceId": "dev_1",
+    "plaintext": "{\"sshPublicKey\":\"ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTY= wrangle@iPhone\",\"deviceName\":\"iPhone\"}",
+    "aad": "host_1|ssh|dev_1",
+    "nonce": "d3JhbmdsZS1uLTAz",
+    "envelope": {
+      "v": 1,
+      "n": "d3JhbmdsZS1uLTAz",
+      "c": "TYvUaIlnz-F2CFS185U9SSFrQ19595DF8t0gDA_qOWIGIemMxHM7zrluXfnj1CE-XJ28RkkGLoGh3EnYLFb4y55AG37sSImwbEbo4VtPL6NPugPKAWR39NZ_yDNGb_wrShRI2dyevrjnkbkWTM-n5AfoQZHab7slmO-q03MgxnGItfiWuRsVMM2DSKY"
+    },
+    "replyPlaintext": "{\"user\":\"alex\",\"port\":22,\"addresses\":[{\"kind\":\"lan\",\"host\":\"Alexs-MacBook-Pro.local\"},{\"kind\":\"tailscale\",\"host\":\"100.101.102.103\"}],\"hostKeys\":[\"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl\"],\"tmuxPath\":\"/opt/homebrew/bin/tmux\"}",
+    "replyAad": "host_1|ssh-reply|dev_1",
+    "replyNonce": "d3JhbmdsZS1uLTA0",
+    "replyEnvelope": {
+      "v": 1,
+      "n": "d3JhbmdsZS1uLTA0",
+      "c": "i6ByXRDDiIxVzfirzseOh7W7XaXh-JPWxfEQsZqIVDr5l4_82re_7XJIo5z860ou7zEwtfTnYZ66Xm0xI0hti6i2Ecg3xnCbyKLzBHGSalwkuaHFacCy2S4XrvvnocbFNG7UShrRLiK4EUW_AWIsUUXYFJY74sogSrPZNgllLww_v_2FyISv_872A57Y8X76zJZFASolRpbi_ZTpEW1Sw657M1kIB0nDC9aMX4PviyPo3tXPKX606UB8arQfI2GbrDa5zQSlICGXnZB7Wc4L8LZYsdd29E4uA1IIhWoTloMdmTQbGCadB0iIh5YWYXxStFtxiVWYldY3PPWXde0aUQwmsCeychL9NxeWQKLbxFn9yD1kmoyGpYU"
+    }
+  }
+}
