@@ -3,8 +3,30 @@
 The program that runs on your Mac or Linux machine for [Wrangle](https://wrangle.stackframes.dev), the iPhone app
 that lets you approve Claude Code and Codex requests from your Lock Screen.
 
+![Wrangle on iPhone: an approval on the Lock Screen, the Sessions list, a session as a chat, and the SSH terminal](docs/screenshots.png)
+
 The iPhone app is closed source. This helper is open so you can read exactly what it does on your computer and what
 it sends over the network.
+
+## How an approval reaches your phone
+
+```mermaid
+sequenceDiagram
+    participant A as Claude Code / Codex
+    participant H as wrangle (this helper)
+    participant R as Relay
+    participant P as iPhone
+    A->>H: PermissionRequest hook (tool + command)
+    H->>R: event, sealed for each paired phone
+    R->>P: push via Apple ("New activity")
+    P->>P: decrypts on device: "Claude wants to run npm test"
+    P->>R: Allow / Always allow / Deny (sealed)
+    R->>H: decision
+    H->>A: allow or deny
+```
+
+If nobody answers in time, the hook returns nothing and the agent asks in the terminal as usual. Answering in the
+terminal first also works: the phone's alert is withdrawn.
 
 ## What it does
 
@@ -27,7 +49,8 @@ it sends over the network.
 | The computer's name and the phone's name, sent once when you pair | Yes |
 
 Push notifications go through Apple. Their visible text is a fixed "New activity"; the phone decrypts the real text
-on the device. The terminal and the chat view connect straight from the phone to your computer over SSH and never
+on the device. The one exception is the relay's own notice when a free plan's monthly alerts run out, which says
+just that. The terminal and the chat view connect straight from the phone to your computer over SSH and never
 pass through the relay.
 
 The full wire format, keys and pairing steps are in [protocol/README.md](protocol/README.md), with test vectors in
@@ -47,6 +70,9 @@ wrangle setup
 ```
 
 `wrangle setup` installs the hooks and the background service, then shows a QR code to scan with the Wrangle app.
+Both sides then show the same security words, so you can check that nothing sits in between.
+
+<img src="docs/connect-start.png" alt="The Wrangle app's Connect screen, ready to scan the code wrangle setup shows" width="280">
 
 | Command | What it does |
 |---|---|
@@ -56,6 +82,28 @@ wrangle setup
 | `wrangle install` / `uninstall` | Add or remove the hooks and the service |
 | `wrangle config keep-awake on\|off` | Stop the Mac from sleeping while it is on power, so agents keep running |
 | `wrangle version` | Print the version |
+
+## Troubleshooting
+
+Run `wrangle doctor`. Each failed check prints its fix:
+
+```text
+$ wrangle doctor
+✓ tmux  /opt/homebrew/bin/tmux
+✓ Remote Login is on
+✓ Tailscale SSH is off (or Tailscale isn't installed)
+✓ 3 addresses for your iPhone
+✓ Wrangle server reachable
+✓ Background service running
+✓ Background service connected to the Wrangle server
+✓ Phone approvals for Claude Code are on
+! Another Claude Code hook approves some commands itself (~/.claude/hooks/auto-approve.sh). Claude won't ask about those, so they won't reach your iPhone. Everything else still does.
+✓ Terminal key for “Alex's iPhone” is in ~/.ssh/authorized_keys
+```
+
+Some commands never reach your phone? Claude Code only asks for permission when nothing else has decided. A
+`PreToolUse` hook that returns `"permissionDecision": "allow"` approves the call before Claude asks, so Wrangle never
+sees it. `doctor` lists any such hook.
 
 ## Tests
 

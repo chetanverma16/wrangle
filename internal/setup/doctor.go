@@ -15,7 +15,9 @@ type DoctorDeps struct {
 	Home, KeysPath string
 	Health         func() error // relay reachable
 	HooksPresent   func() bool
-	SocketAlive    func() bool // `wrangle serve` answers on its socket
+	ProjectHooks   func() bool     // optional: this directory's .claude/ settings send approvals to Wrangle
+	AutoAllow      func() []string // optional: other PreToolUse hooks that approve tool calls themselves
+	SocketAlive    func() bool     // `wrangle serve` answers on its socket
 	Now            func() time.Time
 }
 
@@ -68,7 +70,22 @@ func Doctor(e Env, d DoctorDeps) int {
 	fresh := err == nil && st.Relay == "up" && d.Now().Sub(time.UnixMilli(st.At)) < 15*time.Second
 	check(fresh, "Background service connected to the Wrangle server", "The background service isn't connected to the Wrangle server.",
 		"Check your internet connection; the log is ~/.wrangle/serve.log.")
-	check(d.HooksPresent(), "Phone approvals for Claude Code are on", "Phone approvals are off.", "Run: wrangle install")
+	switch {
+	case d.HooksPresent():
+		ok(w, "Phone approvals for Claude Code are on")
+	case d.ProjectHooks != nil && d.ProjectHooks():
+		ok(w, "Phone approvals for Claude Code are on for this project (run `wrangle install` for every project)")
+	default:
+		check(false, "", "Phone approvals are off.", "Run: wrangle install")
+	}
+	if d.AutoAllow != nil {
+		if hooks := d.AutoAllow(); len(hooks) > 0 {
+			// A warning, not a failure: Claude Code doesn't ask about calls another hook already allowed, so no
+			// PermissionRequest fires for them.
+			fmt.Fprintf(w, "! Another Claude Code hook approves some commands itself (%s). Claude won't ask about those, "+
+				"so they won't reach your iPhone. Everything else still does.\n", SafeName(strings.Join(hooks, ", ")))
+		}
+	}
 	if len(cfg.Devices) == 0 {
 		fail(w, "No iPhone is connected. Run `wrangle setup`.")
 		bad++

@@ -129,3 +129,24 @@ func TestDoctorReportsUnknownWrangleKeysEvenBeforeSetup(t *testing.T) {
 		t.Fatalf("exit %d\n%s", code, out)
 	}
 }
+
+// Hooks in this project's .claude/ settings count: approvals work here, so doctor passes and says where.
+func TestDoctorAcceptsProjectHooks(t *testing.T) {
+	f, d, out := healthyDoctor(t)
+	d.HooksPresent = func() bool { return false }
+	d.ProjectHooks = func() bool { return true }
+	if code := runDoctor(f, d, out); code != 0 || !strings.Contains(out.String(), "✓ Phone approvals for Claude Code are on for this project") {
+		t.Fatalf("exit %d\n%s", code, out)
+	}
+}
+
+// Another hook that approves tool calls itself is a warning, not a failure: Wrangle works, but those calls skip the phone.
+func TestDoctorWarnsAboutAutoAllowHooks(t *testing.T) {
+	f, d, out := healthyDoctor(t)
+	d.AutoAllow = func() []string { return []string{"~/.claude/hooks/rtk-rewrite.sh"} }
+	code := runDoctor(f, d, out)
+	want := "! Another Claude Code hook approves some commands itself (~/.claude/hooks/rtk-rewrite.sh)."
+	if code != 0 || !strings.Contains(out.String(), want) || !strings.Contains(out.String(), "won't reach your iPhone") {
+		t.Fatalf("exit %d\n%s", code, out)
+	}
+}

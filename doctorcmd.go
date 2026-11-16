@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"net"
+	"os"
 	"time"
 
 	"github.com/chetanverma16/wrangle/internal/config"
@@ -25,6 +26,8 @@ func runDoctor() int {
 		Home: home, KeysPath: sshkeys.DefaultPath(), Now: time.Now,
 		Health:       func() error { return relayhttp.Client{URL: relay}.Health(context.Background()) },
 		HooksPresent: func() bool { return install.HooksPresent(p) },
+		ProjectHooks: func() bool { return install.ProjectHooksPresent(cwd()) },
+		AutoAllow:    func() []string { return install.AutoAllowHooks(install.ClaudeSettingsFiles(p, cwd())) },
 		SocketAlive: func() bool {
 			c, err := net.DialTimeout("unix", hookio.SocketPath(home), time.Second)
 			if err != nil {
@@ -34,4 +37,10 @@ func runDoctor() int {
 			return true
 		},
 	})
+}
+
+// cwd is the directory doctor runs in: its .claude/ settings are the project's (empty if it can't be read).
+func cwd() string {
+	d, _ := os.Getwd()
+	return d
 }
