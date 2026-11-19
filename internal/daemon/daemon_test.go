@@ -491,6 +491,19 @@ func TestCodexCommandApprovalKeepsCommandWhateverTheToolName(t *testing.T) {
 	}
 }
 
+// A Bash request without a string command must not reach the phone as a bare "use Bash": the phone has to see
+// what it approves, so the input goes out as Detail like any other tool.
+func TestBashWithoutStringCommandCarriesDetail(t *testing.T) {
+	for _, input := range []string{`{}`, `{"command":["rm","-rf","/"]}`, `{"command":""}`} {
+		req := hookio.Request{Agent: "claude", Event: "permission", Payload: json.RawMessage(
+			`{"session_id":"s","tool_name":"Bash","tool_input":` + input + `,"cwd":"/x/p"}`)}
+		_, p, ok := BuildEvent(req)
+		if !ok || p.Command != "" || p.Detail != canonicalJSON(json.RawMessage(input)) {
+			t.Fatalf("%s: %v %+v", input, ok, p)
+		}
+	}
+}
+
 func TestCanonicalJSONKeepsLargeIntegersExact(t *testing.T) {
 	got := canonicalJSON(json.RawMessage(`{"b":12345678901234567890,"a":1.50}`))
 	want := `{"a":1.50,"b":12345678901234567890}`

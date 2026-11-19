@@ -327,6 +327,12 @@ func pair(ctx context.Context, e Env, r Relay, o Options, p prompter, cfg config
 	}
 	a := relayhttp.Auth{HostID: res.HostID, HostSecret: res.HostSecret}
 	if a.HostSecret == "" {
+		// The stored secret may only be reused for the host it belongs to, on the relay it came from (the offer was
+		// sent with that auth). Otherwise it would go to a different relay.
+		if auth == nil || res.HostID != cfg.HostID {
+			fail(w, "The Wrangle server didn't send this Mac's link. %s", rerun)
+			return 1
+		}
 		a.HostSecret = cfg.HostSecret
 	}
 	withdraw := func() { // best effort, also after Ctrl-C has cancelled ctx

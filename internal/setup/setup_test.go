@@ -478,6 +478,24 @@ func TestSetupNewHostIdentity(t *testing.T) {
 	}
 }
 
+// An offer sent without auth (config saved for another relay) that comes back with no host secret must not fall
+// back to the stored secret: that secret belongs to the other relay and would be sent to this one.
+func TestSetupUnauthenticatedOfferWithoutSecretNeverSendsTheStoredSecret(t *testing.T) {
+	h := newHarness(t, "y\n")
+	h.hooked = true
+	_ = config.Save(h.opts.Home, config.Config{RelayURL: "https://old.test", HostID: "host_old", HostSecret: "old"})
+	h.relay.offer.HostSecret = ""
+	if code := h.run(); code != 1 {
+		t.Fatalf("exit %d\n%s", code, h.out)
+	}
+	if got := strings.Join(h.relay.calls, ","); got != "offer" {
+		t.Fatalf("calls %s", got)
+	}
+	if c, _ := config.Load(h.opts.Home); c.HostID != "host_old" || c.HostSecret != "old" {
+		t.Fatalf("config changed: %+v", c)
+	}
+}
+
 func TestSetupQRWithoutMACFallsBackToTheWords(t *testing.T) {
 	h := newHarness(t, "y\n\n") // hooks yes; Enter at the word check
 	h.relay.key.MAC = ""

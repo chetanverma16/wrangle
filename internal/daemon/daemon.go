@@ -478,16 +478,14 @@ func BuildEvent(req hookio.Request) (string, proto.EventPayload, bool) {
 		// The phone must see in full what it approves: a command or tool input over maxCommand runes is not sent
 		// for remote approval (the hook gets no decision and the agent shows its own prompt).
 		// Codex's shell escalations carry tool_input.command; their tool_name isn't guaranteed to be "Bash".
-		if in.ToolName == "Bash" || (req.Agent == "codex" && isCommand && command != "") {
+		// Only a real, non-empty command string takes the command path; anything else (missing, empty, not a string)
+		// goes out as Detail so the phone never approves a bare "use Bash".
+		if isCommand && command != "" && (in.ToolName == "Bash" || req.Agent == "codex") {
 			if utf8.RuneCountInString(command) > maxCommand {
 				return "", p, false
 			}
 			p.Command = command
-			what := "use " + in.ToolName
-			if command != "" {
-				what = "run " + command
-			}
-			p.Body = truncate(agentName+" wants to "+what, maxBody)
+			p.Body = truncate(agentName+" wants to run "+command, maxBody)
 			return "approval", p, true
 		}
 		p.Detail = canonicalJSON(in.ToolInput)
