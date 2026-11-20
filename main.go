@@ -12,7 +12,7 @@ import (
 	"github.com/chetanverma16/wrangle/internal/usage"
 )
 
-var version = "0.1.0"
+var version = "0.1.1"
 
 func main() {
 	args := os.Args[1:]
